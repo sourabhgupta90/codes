@@ -1,0 +1,328 @@
+
+<!-- saved from url=(0052)http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><!-- This document was created from RTF source by rtftohtml version
+2.6 -->
+<script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/document_iterator.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/find_proxy.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/get_html_text.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/global_constants.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/name_injection_builder.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/number_injection_builder.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/menu_injection_builder.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/string_finder.js"></script><script src="chrome-extension://lifbcibllhkdhoafpjfnlhfpfgnpldfl/change_sink.js"></script><meta name="document_iterator.js"><meta name="find_proxy.js"><meta name="get_html_text.js"><meta name="global_constants.js"><meta name="name_injection_builder.js"><meta name="number_injection_builder.js"><meta name="menu_injection_builder.js"><meta name="string_finder.js"><meta name="change_sink.js"></head><body><a name="PlaceHolder1"></a><title>Introduction
+to C Programming</title>
+<p><b>Introduction to C Programming</b> by Rob Miles, Electronic Engineering</p>
+
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c11.html"><img src="./fread and fwrite_files/previous.gif" width="80" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c13.html"><img src="./fread and fwrite_files/next.gif" width="80" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/contents.html"><img src="./fread and fwrite_files/contents.gif" width="85" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/Upper4/default.htm"><img src="./fread and fwrite_files/hull.gif" width="80" height="25"></a>
+<hr>
+
+<h1>
+Files</h1>
+<dl>
+<dt><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-1">When do we use Files?</a>
+        </dt><dd><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-2">Streams and Files</a>
+</dd><dt><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-3">fopen and fclose</a>
+        </dt><dd><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-4">Mode String</a>
+</dd><dt><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-5">File Functions</a>
+        </dt><dd><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-6">fread and fwrite</a>
+</dd><dt><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html#c12-7">The End of the File and Errors</a>
+</dt></dl>
+
+<hr><a name="c12-1"><h2>
+When do we use Files?</h2>
+<p>If you want your program to be properly useful you have to give it a way of
+storing data when it is not running. We know that you can store data in this
+way, that is how we have kept all the programs we have created so far, in
+files. 
+</p><p>Files are looked after by the operating system of the computer. What we want
+to do is use C to tell the operating system to create files and let us access
+them. The good news is that although different operating systems use different
+ways to look after their files, the way in which you manipulate files in C is
+the same for any computer. We can write a program which creates a file on a PC
+and then use that program to create a file on a UNIX system, with no
+problems.</p>
+</a><a name="c12-2"><h3>
+Streams and Files</h3>
+<p>C makes use of a thing called a <i>stream</i>. A stream is a link between
+your program and a file. Data can flow up or down your stream, so that streams
+can be used to read and write to files. The stream is the thing that links your
+program with the operating system of the computer you are using. The operating
+system actually does the work, and the C system you are using will convert your
+request to use streams into instructions for the operating system you are using
+at the time:</p>
+<p>
+<img src="./fread and fwrite_files/c12.gif"></p>
+<p>C needs somewhere to keep track of a particular stream, it needs to be able
+to remember where you have got to in the file, what you are using the file for
+and so on. We do not need to know just what information C stores about each
+file, and this information may well be different for each operating system.
+</p><p>C hides all this from us by letting us talk in terms of a structure called a
+<b>FILE</b>. A file is a structure which holds information about a particular
+stream. We do not create or manipulate this structure, that is done by the
+input and output routines that come with our version of C. All we have to do is
+maintain a pointer to a <b>FILE</b>, so we can tell the C functions which we
+want to use. If you are really interested, you can find out what a <b>FILE</b>
+is made of by looking in the file <b>STDIO.H</b>.
+</p><p>All the functions to manipulate files are defined in the <b>STDIO.H</b>
+file. They look very similar to the printf and scanf routines that we have used
+already. To remind you that they operate with files, all the file handling
+function names begin with "f".</p>
+<hr></a><a name="c12-3"><h2>
+fopen and fclose</h2>
+<p>The first step in using a file is to open it. Remember that a file can be
+used in different ways; for reading from or writing to, or perhaps both. C lets
+us protect files that we only want to read from by allowing us to open a file
+in read mode. This means that we are not allowed to change the contents of the
+file opened for reading. You tell the input/output system about the file you
+want to open by means of a mode string. This gives information about the type
+of file you are working on and the way in which it is to be used.
+</p><p>We open the file by using the function <b>fopen</b>. This has two
+parameters; the name of the file to be opened and the mode to use. It returns a
+pointer to a <b>FILE</b> structure which it creates, for example :</p>
+<dl><dt></dt><dd><pre>FILE * listing_output ;
+FILE * program_input ;
+listing_output = fopen ( "LISTING", "w" ) ; 
+program_input = fopen ( "PROGRAM", "r" ) ;</pre></dd></dl><p>This
+opens a couple of files, <b>LISTING</b> is opened for output and <b>PROGRAM</b>
+is opened for reading.</p>
+<dl>
+<dt><i>See the section on POINTERS for more about NULL.</i>
+</dt><dd>If the files do not exist, or there is a problem opening them, <b>fopen</b>
+returns a special value called <b>NULL</b>. You must always make sure that the
+open has worked before you try to do anything with a file, e.g.</dd></dl>
+<dl><dt></dt><dd><pre>FILE * listing_output ;
+listing_output = fopen ( "LISTING", "w" ) ;
+if (listing_output == NULL ) {
+	printf ( "I could not open your output file.\n" ) ;
+}</pre></dd></dl><p>You
+can use a string as the name of the file you want to open, so that you could
+ask the user for the name of the output file and then open a file with that
+name. Note that the file is opened in the current directory, and that you must
+observe the conventions of the computer you are using with regard to file names.
+</p><p>When you open a file for reading, you are assuming that the file exists. If
+it does not, <b>fopen</b> will give you an error. When you open a file for
+writing the file may or may not exist, and <b>fopen</b> will create one for you
+if it needs to. This can lead to problems, what we have here is a very good way
+of destroying data by mistake. When you open an existing file for writing, even
+if the file is enormous, <b>fopen</b> will clobber the contents and start
+writing at the top of the file. You do not get a warning, all you get is a
+sinking feeling as several weeks work go down the tubes.....
+</p><p>Because I make a point of writing user-proof programs I therefore make sure
+that a user really wants to overwrite a file before I let him or her do it.
+This means that I find out if a file exists before I let the user write all
+over it. It is very easy to do this; you simply try to open the file for
+reading :</p>
+<dl><dt></dt><dd><pre>FILE * output_file ;
+char output_file_name [50] ;
+char reply [20] ;
+do {
+	printf ( "Give the name of your output file : " ) ;
+	gets ( output_file_name ) ;
+	output_file = fopen ( output_file_name, "r" ) ;
+	if ( output_file != NULL ) {
+		fclose ( output_file ) ;
+		printf ( "Overwrite this file ? (Y or N) : " ) ;
+		gets ( reply ) ;
+		if ( reply [0] != 'Y' ) {
+			continue ;
+		}
+	}
+} while ( fopen ( output_file_name, "w" ) ) ;</pre></dd></dl><p>This
+snippet of code will loop until the user gives us a file which they say we can
+overwrite, and the file is opened successfully. Note the use of the underrated
+<b>continue</b> half way down. This causes the loop to start again from the
+top, which makes the program ask for another filename. Note also the use of the
+function <b>fclose</b>. <b>fclose</b> causes the file to be closed. It has one
+parameter, the file pointer whose file needs to be closed.
+</p><p>You must always close a file when you have finished with it. This is
+particularly important if you are writing to the file. The operating system
+does not switch on the disk drive to write just a single character to the disk,
+rather it waits until it has a load to write and then writes the lot in one go.
+This increases efficiency, but it does mean that at any time during your output
+some of the data is on the disk and the rest is in a buffer. Only when you call
+<b>fclose</b> is the buffer emptied and the disk written with all the
+information. If you want to force the buffer to be emptied onto the disk at any
+time, and ensure that it is up to date - but do not want to close the file,
+there is a function called <b>fflush</b> which will do this for you.</p>
+</a><a name="c12-4"><h3>
+Mode String</h3>
+<p>The <b>fopen</b> function is told how to open the file by means of the mode
+string. The file opened is marked with the mode which is being used, and then
+other file input-output functions look at the mode before doing anything. This
+is how C stops you from writing to a file which was opened for input. The mode
+string can contain the following characters.
+</p><p></p>
+
+
+<dl> <dt>w </dt><dd>open the file for writing. If the file does not exist it is
+created. If the file does exist it is emptied, and we start with a new
+one.  
+<p>Opens using w fail if the operating system is unable to open a file
+for output. This would usually be because the disk we are using is write
+protected or full, or if you are on a system which can share files, and
+somebody else has connected their program to the file in question. 
+
+</p><p></p>
+</dd><dt><b><tt>r</tt></b>
+</dt><dd>open the file for reading. You will be unable to write into the file,
+but can read from it.  <p>Opens using r fail if the file does not exist, or
+if the file is protected in some way which denies us access. 
+
+</p><p></p>
+</dd><dt><b><tt>a</tt></b>
+</dt><dd>open the file for append. If the file exists we are moved to the end
+of the file, i.e. if we send any data to a file opened for append it will
+be placed on the end of the file. If the file does not exist it is created
+for us.  
+<p>Opens using a generally fail for the same reasons as opens using w. 
+
+</p><p></p>
+</dd><dt><b><tt>b</tt></b>
+
+</dt><dd>open the file as a binary file. Essentially there are two kinds of
+data on a computer. Stuff which makes sense to us, and stuff which makes
+sense to the machine itself. Stuff which makes sense to us is in the form
+of text, i.e. nothing in the file other than letters and numbers etc.
+Stuff which makes sense to the computer includes program files and any
+data file which needs to be translated by a program before it can be
+understood by people, e.g. spreadsheet data files. This data is called
+binary. 
+
+<p>If you open a file of type binary you are telling C that you want it to
+send the data exactly as you output it. i.e. it must not perform any
+translations which make this file easier for humans to make sense of. 
+
+</p><p></p>
+</dd><dt><b><tt>t</tt></b>
+
+</dt><dd>open the file as a text file. Text files only contain printable
+characters, i.e. things that you or I would like to see. C will therefore
+make some changes to the file when it is output, usually in terms of what
+happens at the end of a line of text: some computer systems use two
+characters to mark the end of a line and others only use one. 
+
+<p>When a text file is opened the C input/output routines will perform the
+translation required. If you open a binary file as a text file you will
+notice very strange things happen.  Remember that the C input/output
+system has no way of knowing which kind of file you really want to use,
+and so will do the wrong thing if you tell it to. 
+
+</p><p>
+</p></dd><dt><b><tt>+</tt></b>
+</dt><dd>This means that you want to use the file for both       
+reading and writing. You can put + after r or w. If     
+you put it after a r (read) it means that the file is   
+not destroyed if it exists, and that an error is        
+produced if the file does not exist. If you put +       
+after a w (write) it means that the file is destroyed   
+if it exists, and a new file is created if required.    
+</dd></dl>
+
+<p>Some examples of file open modes and what they mean :
+</p><dl>
+<dt>"rb+"
+</dt><dd>	Open the file for reading and writing in binary mode. If the file does
+not exist do not create it. If the file does exist do not destroy it.
+</dd><dt>"wt"
+</dt><dd>Open the file for writing in text mode. If the file does exist destroy
+it. If the file does not exist create one.
+</dd></dl>
+<hr></a><a name="c12-5"><h2>
+File Functions</h2>
+<p>As I said above, we can use the functions <b>fprintf</b> and <b>fscanf</b>
+to communicate with our files :</p>
+<dl><dt></dt><dd><pre>fprintf ( listing_output, "This is a listing file\n" ) ;
+fscanf ( program_input, "%d", &amp;counter ) ;</pre></dd></dl><p>The
+functions work in exactly the same way as <b>scanf</b> and <b>printf</b>,
+except that they use the file linked to the <b>FILE</b> pointer rather than the
+keyboard and screen. There are file versions of all the input and output
+functions we have covered so far.
+</p><p>In addition there are some very useful functions which let us save and load
+chunks of memory in files. These are very useful when you come to put
+structures and arrays into files. You might think that to save an array to disk
+you have to write each individual element out using some kind of loop. You can
+do this, but there is a much easier way of doing it.</p>
+</a><a name="c12-6"><h3>
+fread and fwrite</h3>
+<p>You can regard an array, or an array of structured variables, as simply a
+block of memory of a particular size. The input/output routines provide you
+with routines that you can call to drop a chunk of memory onto a disk file with
+a single function call. However, there is one thing you must remember. If you
+want to store blocks of memory in this way the file must be opened as a binary
+file. What you are doing is putting a piece of the program memory out on the
+disk. You do not know how this memory is organised, and will never want to look
+at this, so you must open the file as a binary file. If you want to print or
+read text you use the <b>fprintf</b> or <b>scanf</b> functions.
+</p><p>The function <b>fwrite</b> sends a block of memory out to the specified
+file. To do this it needs to know three things; where the memory starts, how
+much memory to send, and the file to send the memory to. The location of the
+memory is just a simple pointer, the destination is a pointer to a <b>FILE</b>
+which has been opened previously, the amount of memory to send is given in two
+parts, the size of each chunk, and the number of chunks. This might seem rather
+long winded, but is actually rather sensible. Consider :</p>
+<dl><dt></dt><dd><pre>typedef struct
+{
+	char name [30] ;
+	char address [60] ; 
+	int account ;
+	int balance ;
+	int overdraft ;
+} customer ;
+
+customer Hull_Branch [100] ;
+FILE * Hull_File ;
+	.
+	.
+	.
+fwrite ( Hull_Branch, sizeof ( customer ), 100, Hull_File ) ;</pre></dd></dl><p>The
+first parameter to <b>fwrite</b> is the pointer to the base of the array of our
+customers. The second parameter is the size of each block to save. We can use
+<b>sizeof</b> to find out the size of the structure. The third parameter is the
+number of customer records to store, in this case 100 and the final parameter
+is the file which we have opened. Note that if we change the number of items in
+the customer structure this code will still work, because the amount of data
+saved changes as well.
+</p><p>The opposite of <b>fwrite</b> is <b>fread</b>.	 This works in exactly the
+same way, but
+</p><p>fetches data from the file and puts it into memory:</p>
+<dl><dt></dt><dd><pre>fread ( Hull_Branch, sizeof ( customer ), 100, Hull_Data ) ;</pre></dd></dl><p>If
+you want to check that things worked, these functions return the number of
+items that they transferred successfully :</p>
+<dl><dt></dt><dd><pre>if ( fread ( Hull_Branch, sizeof ( customer ), 100, Hull_Data ) &lt; 100 ) {
+	printf ( "Not all data has been read!\n\n" ) ;
+}</pre></dd></dl>
+
+<hr></a><a name="c12-7"><h2>The End of the File and Errors</h2>
+<p>Any file maintained by the operating system has a particular size. As you
+write a file it is made bigger until you close it, so the only problems that
+you have when sending output to a file are concerned with what happens when you
+run out of disk space. We have already seen above that the standard C
+input/output functions can tell you how many items they have successfully
+transferred; you should always use the value they give back to test that your
+dealings with files are going properly.
+</p><p>When you are reading from a file it is useful to be able to check whether or
+not you have reached the end, without just failing to read. The function
+<b>feof</b> can be used to find out if you have hit the end :</p>
+<dl><dt></dt><dd><pre>if ( feof (input_file ) ) printf ( "BANG!\n" ) ;</pre></dd></dl><p>This
+function returns the value 0 if the end of the file has not been reached, and
+another value if it has. It takes a <b>FILE</b> pointer as a parameter.
+</p><p>Note that binary and text files have different methods of determining the
+end of a file. If you are having problems because you keep reaching the end of
+the file before you think you should it may be because you have opened the file
+in the wrong mode.<b>
+</b></p><p><b>feof</b> has a twin brother called <b>ferror</b> who can be called to find
+out if an error has been caused due to a file operation. It is worth calling
+this if you find that less items have been transferred by a read or a write
+than you expected. The error number that you get back is specific to the
+operating system you are using but it can be used to make program more
+friendly, for example your program could tell the difference between "no disk
+in the drive" and "the disk has completely failed".
+</p>
+<hr>
+
+</a><a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c11.html"><img src="./fread and fwrite_files/previous.gif" width="80" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c13.html"><img src="./fread and fwrite_files/next.gif" width="80" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/contents.html"><img src="./fread and fwrite_files/contents.gif" width="85" height="25"></a>
+<a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/Upper4/default.htm"><img src="./fread and fwrite_files/hull.gif" width="80" height="25"></a>
+
+<p></p>
+<address>Rob Miles, R.S.Miles@e-eng.hull.ac.uk, Electronic Engineering<br>
+HTML by <a href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/www.hull.ac.uk/Hull/contacts/bareid.html">Bronwen Reid</a>, July 1995</address>
+
+</body><span id="skype_highlighting_settings" display="none" autoextractnumbers="1"></span><object id="skype_plugin_object" location.href="http://www2.sis.pitt.edu/~ir/KS/Data/RMiles/c12.html" location.hostname="www2.sis.pitt.edu" style="position: absolute; visibility: hidden; left: -100px; top: -100px; " width="0" height="0" type="application/x-vnd.skype.click2call.chrome.5.7.0"></object></html>
